@@ -1,0 +1,49 @@
+# Archivos de compilación
+bin/
+obj/
+
+# Archivos de Visual Studio
+.vs/
+*.user
+*.userosscache
+*.suo
+*.userprefs
+
+# Archivos de Rider
+.idea/
+*.sln.iml
+
+# Archivos de VS Code
+.vscode/
+*.code-workspace
+
+# Archivos de NuGet
+*.nupkg
+*.snupkg
+**/packages/*
+!**/packages/build/
+*.nuget.props
+*.nuget.targets
+
+# Archivos de logs
+*.log
+
+# Archivos temporales
+*.swp
+*.*~
+project.lock.json
+.DS_Store
+*.pyc
+nupkg/
+
+# Archivos de publicación
+**/Properties/PublishProfiles/
+**/Properties/launchSettings.json
+
+# Archivos de cobertura de código
+*.coverage
+*.coveragexml
+
+# Archivos de prueba
+TestResults/
+[Tt]est[Rr]esult*/ 
