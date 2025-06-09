@@ -1,0 +1,6 @@
+@Mibot_HostAddress = http://localhost:5206
+
+GET {{Mibot_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

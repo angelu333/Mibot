@@ -1,15 +1,4 @@
-# Dependencias Node.js
-node_modules/
-npm-debug.log
-yarn-debug.log
-yarn-error.log
-
-# Archivos de entorno
-.env
-.env.local
-.env.*.local
-
-# Archivos de compilación .NET
+# Archivos de compilación
 bin/
 obj/
 
@@ -37,7 +26,6 @@ obj/
 *.nuget.targets
 
 # Archivos de logs
-logs
 *.log
 
 # Archivos temporales
@@ -55,12 +43,7 @@ nupkg/
 # Archivos de cobertura de código
 *.coverage
 *.coveragexml
-coverage/
 
 # Archivos de prueba
 TestResults/
 [Tt]est[Rr]esult*/
-
-# Directorios de construcción
-dist/
-build/
