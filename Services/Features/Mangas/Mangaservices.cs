@@ -2,75 +2,87 @@
 using Mibot.Domain.Entities;
 using System.Collections.Generic;       // Para usar List<T>
 using System.Linq;                      // Para usar LINQ (FirstOrDefault, etc.)
+using Supabase;
 
 namespace Mibot.Services.Features.Mangas;
 
 public class MangaService
 {
-    // Nuestra "base de datos" en memoria por ahora.
-    // La hacemos 'static' para que sea compartida entre instancias si el servicio es Scoped,
-    // o simplemente una por instancia si es Singleton (lo veremos luego).
-    // Para un ejemplo inicial simple, vamos a hacerla no-static y veremos el efecto de los tiempos de vida del servicio.
-    private readonly List<Manga> _mangas;
-    private int _nextId = 1; // Para generar IDs simples
+    private readonly Client _supabase;
+    private const string SUPABASE_URL = "https://nwxtzgufuxfffjlaaxps.supabase.co";
+    private const string SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im53eHR6Z3VmdXhmZmZqbGFheHBzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDkzNjAyMTAsImV4cCI6MjA2NDkzNjIxMH0.iYH2IPY-GnCMYEvcokksnxEpkltvWWDztyZVouY2pvw";
 
     public MangaService()
     {
-        _mangas = new List<Manga>();
-        // Podríamos añadir algunos mangas de ejemplo aquí para pruebas iniciales
-        // Add(new Manga { Title = "Naruto", Author = "Masashi Kishimoto", PublicationDate = new DateTime(1999, 9, 21), Volumes = 72, IsOngoing = false, Genre = "Shonen" });
-        // Add(new Manga { Title = "One Piece", Author = "Eiichiro Oda", PublicationDate = new DateTime(1997, 7, 22), Volumes = 100, IsOngoing = true, Genre = "Shonen" }); // ¡Añade el Id al crear!
+        _supabase = new Client(SUPABASE_URL, SUPABASE_KEY);
     }
 
     // Operaciones CRUD (Create, Read, Update, Delete)
 
     // READ All
-    public IEnumerable<Manga> GetAll()
+    public async Task<IEnumerable<Manga>> GetAll()
     {
-        return _mangas;
+        var response = await _supabase
+            .From<Manga>("mangas")
+            .Select("*")
+            .Execute();
+        return response.Models;
     }
 
     // READ by Id
-    public Manga? GetById(int id) // Devolvemos Manga? para indicar que podría no encontrarse
+    public async Task<Manga?> GetById(int id) // Devolvemos Manga? para indicar que podría no encontrarse
     {
-        return _mangas.FirstOrDefault(manga => manga.Id == id);
+        var response = await _supabase
+            .From<Manga>("mangas")
+            .Select("*")
+            .Where(m => m.Id == id)
+            .Single();
+        return response.Model;
     }
 
     // CREATE
-    public Manga Add(Manga manga)
+    public async Task<Manga> Add(Manga manga)
     {
-        manga.Id = _nextId++; // Asignamos un nuevo ID
-        _mangas.Add(manga);
-        return manga; // Devolvemos el manga creado (con su ID)
+        var response = await _supabase
+            .From<Manga>("mangas")
+            .Insert(manga)
+            .Execute();
+        return response.Model;
     }
 
     // UPDATE
-    public bool Update(Manga mangaToUpdate)
+    public async Task<bool> Update(Manga mangaToUpdate)
     {
-        var existingManga = _mangas.FirstOrDefault(m => m.Id == mangaToUpdate.Id);
-        if (existingManga != null)
+        try
         {
-            // Actualizamos las propiedades del manga existente
-            existingManga.Title = mangaToUpdate.Title;
-            existingManga.Author = mangaToUpdate.Author;
-            existingManga.Genre = mangaToUpdate.Genre;
-            existingManga.PublicationDate = mangaToUpdate.PublicationDate;
-            existingManga.Volumes = mangaToUpdate.Volumes;
-            existingManga.IsOngoing = mangaToUpdate.IsOngoing;
-            return true; // Indicamos que la actualización fue exitosa
+            var response = await _supabase
+                .From<Manga>("mangas")
+                .Update(mangaToUpdate)
+                .Where(m => m.Id == mangaToUpdate.Id)
+                .Execute();
+            return response.Model != null;
         }
-        return false; // Indicamos que no se encontró el manga para actualizar
+        catch
+        {
+            return false;
+        }
     }
 
     // DELETE
-    public bool Delete(int id)
+    public async Task<bool> Delete(int id)
     {
-        var mangaToRemove = _mangas.FirstOrDefault(manga => manga.Id == id);
-        if (mangaToRemove != null)
+        try
         {
-            _mangas.Remove(mangaToRemove);
-            return true; // Indicamos que la eliminación fue exitosa
+            var response = await _supabase
+                .From<Manga>("mangas")
+                .Delete()
+                .Where(m => m.Id == id)
+                .Execute();
+            return response.Model != null;
         }
-        return false; // Indicamos que no se encontró el manga para eliminar
+        catch
+        {
+            return false;
+        }
     }
 }

@@ -17,16 +17,17 @@ namespace Mibot.Controllers
 
         // GET: api/Manga
         [HttpGet]
-        public ActionResult<IEnumerable<Manga>> Get()
+        public async Task<ActionResult<IEnumerable<Manga>>> Get()
         {
-            return Ok(_mangaService.GetAll());
+            var mangas = await _mangaService.GetAll();
+            return Ok(mangas);
         }
 
         // GET: api/Manga/5
         [HttpGet("{id}")]
-        public ActionResult<Manga> Get(int id)
+        public async Task<ActionResult<Manga>> Get(int id)
         {
-            var manga = _mangaService.GetById(id);
+            var manga = await _mangaService.GetById(id);
             if (manga == null)
             {
                 return NotFound();
@@ -36,22 +37,22 @@ namespace Mibot.Controllers
 
         // POST: api/Manga
         [HttpPost]
-        public ActionResult<Manga> Post([FromBody] Manga manga)
+        public async Task<ActionResult<Manga>> Post([FromBody] Manga manga)
         {
-            _mangaService.Add(manga);
-            return CreatedAtAction(nameof(Get), new { id = manga.Id }, manga);
+            var newManga = await _mangaService.Add(manga);
+            return CreatedAtAction(nameof(Get), new { id = newManga.Id }, newManga);
         }
 
         // PUT: api/Manga/5
         [HttpPut("{id}")]
-        public IActionResult Put(int id, [FromBody] Manga manga)
+        public async Task<IActionResult> Put(int id, [FromBody] Manga manga)
         {
             if (id != manga.Id)
             {
                 return BadRequest();
             }
 
-            if (_mangaService.Update(manga))
+            if (await _mangaService.Update(manga))
             {
                 return NoContent();
             }
@@ -60,9 +61,9 @@ namespace Mibot.Controllers
 
         // DELETE: api/Manga/5
         [HttpDelete("{id}")]
-        public IActionResult Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
-            if (_mangaService.Delete(id))
+            if (await _mangaService.Delete(id))
             {
                 return NoContent();
             }
