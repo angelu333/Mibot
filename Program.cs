@@ -8,7 +8,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 // AQUÍ REGISTRAMOS NUESTRO SERVICIO
 // Usaremos Singleton para que la lista en memoria persista durante la vida de la aplicación.
-builder.Services.AddSingleton<MangaService>();
+builder.Services.AddScoped<IMangaRepository, MangaRepository>();
+builder.Services.AddScoped<MangaService>();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

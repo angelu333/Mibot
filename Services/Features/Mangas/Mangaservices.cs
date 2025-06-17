@@ -1,20 +1,21 @@
 // JaveragesLibrary/Services/Features/Mangas/MangaService.cs
 using Mibot.Domain.Entities;
+using Mibot.Data.Repositories;
 using System.Collections.Generic;       // Para usar List<T>
 using System.Linq;                      // Para usar LINQ (FirstOrDefault, etc.)
 using Supabase;
+using Microsoft.Extensions.Configuration;
+using System.Threading.Tasks;
 
 namespace Mibot.Services.Features.Mangas;
 
 public class MangaService
 {
-    private readonly Client _supabase;
-    private const string SUPABASE_URL = "https://nwxtzgufuxfffjlaaxps.supabase.co";
-    private const string SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im53eHR6Z3VmdXhmZmZqbGFheHBzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDkzNjAyMTAsImV4cCI6MjA2NDkzNjIxMH0.iYH2IPY-GnCMYEvcokksnxEpkltvWWDztyZVouY2pvw";
+    private readonly IMangaRepository _mangaRepository;
 
-    public MangaService()
+    public MangaService(IMangaRepository mangaRepository)
     {
-        _supabase = new Client(SUPABASE_URL, SUPABASE_KEY);
+        _mangaRepository = mangaRepository;
     }
 
     // Operaciones CRUD (Create, Read, Update, Delete)
@@ -22,67 +23,30 @@ public class MangaService
     // READ All
     public async Task<IEnumerable<Manga>> GetAll()
     {
-        var response = await _supabase
-            .From<Manga>("mangas")
-            .Select("*")
-            .Execute();
-        return response.Models;
+        return await _mangaRepository.GetAllAsync();
     }
 
     // READ by Id
     public async Task<Manga?> GetById(int id) // Devolvemos Manga? para indicar que podría no encontrarse
     {
-        var response = await _supabase
-            .From<Manga>("mangas")
-            .Select("*")
-            .Where(m => m.Id == id)
-            .Single();
-        return response.Model;
+        return await _mangaRepository.GetByIdAsync(id);
     }
 
     // CREATE
     public async Task<Manga> Add(Manga manga)
     {
-        var response = await _supabase
-            .From<Manga>("mangas")
-            .Insert(manga)
-            .Execute();
-        return response.Model;
+        return await _mangaRepository.AddAsync(manga);
     }
 
     // UPDATE
-    public async Task<bool> Update(Manga mangaToUpdate)
+    public async Task<bool> Update(Manga manga)
     {
-        try
-        {
-            var response = await _supabase
-                .From<Manga>("mangas")
-                .Update(mangaToUpdate)
-                .Where(m => m.Id == mangaToUpdate.Id)
-                .Execute();
-            return response.Model != null;
-        }
-        catch
-        {
-            return false;
-        }
+        return await _mangaRepository.UpdateAsync(manga);
     }
 
     // DELETE
     public async Task<bool> Delete(int id)
     {
-        try
-        {
-            var response = await _supabase
-                .From<Manga>("mangas")
-                .Delete()
-                .Where(m => m.Id == id)
-                .Execute();
-            return response.Model != null;
-        }
-        catch
-        {
-            return false;
-        }
+        return await _mangaRepository.DeleteAsync(id);
     }
 }
