@@ -2,11 +2,13 @@
 using Microsoft.AspNetCore.Mvc;
 using Mibot.Domain.Entities;
 using Mibot.Services.Features.Mangas;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Mibot.Controllers.V1;
 
 [ApiController] // Indica que esta clase es un controlador de API
 [Route("api/v1/[controller]")] // Define la ruta base: "api/v1/manga"
+[Authorize]
 public class MangaController : ControllerBase // Base para controladores de API
 {
     private readonly MangaService _mangaService;
