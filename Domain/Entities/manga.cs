@@ -1,7 +1,10 @@
 // Mibot/Domain/Entities/Manga.cs
 namespace Mibot.Domain.Entities;
+using Postgrest.Attributes;
+using Postgrest.Models;
 
-public class Manga
+[Table("mangas")]
+public class Manga : BaseModel
 {
     public int Id { get; set; } // Identificador único
     public string Title { get; set; } = string.Empty; // Título del manga (C# 11 'required')

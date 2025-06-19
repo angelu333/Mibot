@@ -1,9 +1,9 @@
 // JaveragesLibrary/Controllers/V1/MangaController.cs
-using JaveragesLibrary.Domain.Entities;
-using JaveragesLibrary.Services.Features.Mangas; // ¡Necesitamos nuestro servicio!
-using Microsoft.AspNetCore.Mvc;                 // Para [ApiController], [Route], IActionResult, etc.
+using Microsoft.AspNetCore.Mvc;
+using Mibot.Domain.Entities;
+using Mibot.Services.Features.Mangas;
 
-namespace JaveragesLibrary.Controllers.V1;
+namespace Mibot.Controllers.V1;
 
 [ApiController] // Indica que esta clase es un controlador de API
 [Route("api/v1/[controller]")] // Define la ruta base: "api/v1/manga"
@@ -19,17 +19,17 @@ public class MangaController : ControllerBase // Base para controladores de API
 
     // GET api/v1/manga
     [HttpGet]
-    public IActionResult GetAll()
+    public async Task<IActionResult> GetAll()
     {
-        var mangas = _mangaService.GetAll();
+        var mangas = await _mangaService.GetAll();
         return Ok(mangas); // 200 OK con la lista de mangas
     }
 
     // GET api/v1/manga/{id}
     [HttpGet("{id:int}")] // Restricción de ruta: id debe ser un entero
-    public IActionResult GetById([FromRoute] int id) // [FromRoute] es opcional aquí, pero explícito
+    public async Task<IActionResult> GetById([FromRoute] int id) // [FromRoute] es opcional aquí, pero explícito
     {
-        var manga = _mangaService.GetById(id);
+        var manga = await _mangaService.GetById(id);
         if (manga == null)
         {
             return NotFound(new { Message = $"Manga con ID {id} no encontrado." }); // 404 Not Found
@@ -39,20 +39,20 @@ public class MangaController : ControllerBase // Base para controladores de API
 
     // POST api/v1/manga
     [HttpPost]
-    public IActionResult Add([FromBody] Manga manga) // [FromBody] indica que el manga viene en el cuerpo de la petición
+    public async Task<IActionResult> Add([FromBody] Manga manga) // [FromBody] indica que el manga viene en el cuerpo de la petición
     {
         if (!ModelState.IsValid) // Validaciones básicas (ej: si 'required' no se cumple)
         {
             return BadRequest(ModelState);
         }
-        var newManga = _mangaService.Add(manga);
+        var newManga = await _mangaService.Add(manga);
         // 201 Created. Devuelve la URL para obtener el nuevo recurso y el recurso mismo.
         return CreatedAtAction(nameof(GetById), new { id = newManga.Id }, newManga);
     }
 
     // PUT api/v1/manga/{id}
     [HttpPut("{id:int}")]
-    public IActionResult Update([FromRoute] int id, [FromBody] Manga mangaToUpdate)
+    public async Task<IActionResult> Update([FromRoute] int id, [FromBody] Manga mangaToUpdate)
     {
         if (id != mangaToUpdate.Id)
         {
@@ -63,7 +63,7 @@ public class MangaController : ControllerBase // Base para controladores de API
             return BadRequest(ModelState);
         }
 
-        var success = _mangaService.Update(mangaToUpdate);
+        var success = await _mangaService.Update(mangaToUpdate);
         if (!success)
         {
             return NotFound(new { Message = $"Manga con ID {id} no encontrado para actualizar." }); // 404 Not Found
@@ -73,9 +73,9 @@ public class MangaController : ControllerBase // Base para controladores de API
 
     // DELETE api/v1/manga/{id}
     [HttpDelete("{id:int}")]
-    public IActionResult Delete([FromRoute] int id)
+    public async Task<IActionResult> Delete([FromRoute] int id)
     {
-        var success = _mangaService.Delete(id);
+        var success = await _mangaService.Delete(id);
         if (!success)
         {
             return NotFound(new { Message = $"Manga con ID {id} no encontrado para eliminar." }); // 404 Not Found

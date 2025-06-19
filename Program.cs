@@ -13,17 +13,17 @@ builder.Services.AddSingleton<MangaService>();
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(options =>
+builder.Services.AddSwaggerGen(c =>
 {
-    options.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
+    c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
     {
-        Version = "v1",
         Title = "MangaBot API",
-        Description = "Una API para gestionar una increíble colección de mangas",
+        Version = "v1",
+        Description = "API para gestionar una colección de mangas",
         Contact = new Microsoft.OpenApi.Models.OpenApiContact
         {
-            Name = "Tu Nombre/Equipo",
-            Url = new Uri("https://tuwebsite.com")
+            Name = "Tu Equipo",
+            Email = "tu@email.com"
         }
     });
 });
@@ -31,15 +31,12 @@ builder.Services.AddSwaggerGen(options =>
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+app.UseSwagger();
+app.UseSwaggerUI(c =>
 {
-    app.UseSwagger();
-    app.UseSwaggerUI(options =>
-    {
-        options.SwaggerEndpoint("/swagger/v1/swagger.json", "MangaBot API V1");
-        options.RoutePrefix = string.Empty; // Para que Swagger UI esté en la raíz (http://localhost:XXXX/)
-    });
-}
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "MangaBot API V1");
+    c.RoutePrefix = string.Empty;
+});
 
 app.UseHttpsRedirection();
 app.UseAuthorization(); // Lo veremos más adelante

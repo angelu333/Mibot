@@ -3,18 +3,19 @@ using Mibot.Domain.Entities;
 using System.Collections.Generic;       // Para usar List<T>
 using System.Linq;                      // Para usar LINQ (FirstOrDefault, etc.)
 using Supabase;
+using Postgrest;
 
 namespace Mibot.Services.Features.Mangas;
 
 public class MangaService
 {
-    private readonly Client _supabase;
+    private readonly Supabase.Client _supabase;
     private const string SUPABASE_URL = "https://nwxtzgufuxfffjlaaxps.supabase.co";
     private const string SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im53eHR6Z3VmdXhmZmZqbGFheHBzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDkzNjAyMTAsImV4cCI6MjA2NDkzNjIxMH0.iYH2IPY-GnCMYEvcokksnxEpkltvWWDztyZVouY2pvw";
 
     public MangaService()
     {
-        _supabase = new Client(SUPABASE_URL, SUPABASE_KEY);
+        _supabase = new Supabase.Client(SUPABASE_URL, SUPABASE_KEY);
     }
 
     // Operaciones CRUD (Create, Read, Update, Delete)
@@ -23,9 +24,8 @@ public class MangaService
     public async Task<IEnumerable<Manga>> GetAll()
     {
         var response = await _supabase
-            .From<Manga>("mangas")
-            .Select("*")
-            .Execute();
+            .From<Manga>()
+            .Get();
         return response.Models;
     }
 
@@ -33,21 +33,19 @@ public class MangaService
     public async Task<Manga?> GetById(int id) // Devolvemos Manga? para indicar que podría no encontrarse
     {
         var response = await _supabase
-            .From<Manga>("mangas")
-            .Select("*")
-            .Where(m => m.Id == id)
-            .Single();
-        return response.Model;
+            .From<Manga>()
+            .Where(x => x.Id == id)
+            .Get();
+        return response.Models.FirstOrDefault();
     }
 
     // CREATE
     public async Task<Manga> Add(Manga manga)
     {
         var response = await _supabase
-            .From<Manga>("mangas")
-            .Insert(manga)
-            .Execute();
-        return response.Model;
+            .From<Manga>()
+            .Insert(manga);
+        return response.Models.First();
     }
 
     // UPDATE
@@ -56,11 +54,10 @@ public class MangaService
         try
         {
             var response = await _supabase
-                .From<Manga>("mangas")
-                .Update(mangaToUpdate)
-                .Where(m => m.Id == mangaToUpdate.Id)
-                .Execute();
-            return response.Model != null;
+                .From<Manga>()
+                .Where(x => x.Id == mangaToUpdate.Id)
+                .Update(mangaToUpdate);
+            return response.Models.Any();
         }
         catch
         {
@@ -73,12 +70,11 @@ public class MangaService
     {
         try
         {
-            var response = await _supabase
-                .From<Manga>("mangas")
-                .Delete()
-                .Where(m => m.Id == id)
-                .Execute();
-            return response.Model != null;
+            await _supabase
+                .From<Manga>()
+                .Where(x => x.Id == id)
+                .Delete();
+            return true;
         }
         catch
         {
