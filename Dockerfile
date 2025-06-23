@@ -2,13 +2,9 @@
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
-COPY Mibot.sln ./
-COPY Mibot ./Mibot
-RUN dotnet restore ./Mibot/Mibot.csproj
-
-# Copia el resto de los archivos y publica
 COPY . .
 WORKDIR /src/Mibot
+RUN dotnet restore
 RUN dotnet publish -c Release -o /app
 
 # Etapa de runtime
