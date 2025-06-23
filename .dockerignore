@@ -1,0 +1,10 @@
+bin/
+obj/
+*.md
+.git
+.gitignore
+.vscode
+publish/
+node_modules/
+*.log
+.env 
