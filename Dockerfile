@@ -2,12 +2,11 @@
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
-COPY Mibot.sln ./
-COPY Mibot ./Mibot
+COPY . .
 
+WORKDIR /src
 RUN dotnet restore Mibot.sln
 
-COPY . .
 WORKDIR /src/Mibot
 RUN dotnet publish -c Release -o /app
 
